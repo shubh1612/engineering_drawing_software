@@ -150,7 +150,21 @@ class Model3D
 
 void getRotaionMatrix(float x, float y, float z, double a[][3])
 {
-	for(int i=0;i<3;i++) a[i][i] = 1;
+	float value = z/(pow(x*x+y*y+z*z, 0.5));
+	float theta = acos(value);
+	float qr, q1, q2, q3 = 0;
+	qr = cos(theta/2);
+	q1 = -y*sin(theta/2)/(pow(x*x+y*y, 0.5));
+	q2 = x*sin(theta/2)/(pow(x*x+y*y, 0.5));
+	a[0][0] = 1 - 2*(q2*q2 + q3*q3);
+	a[0][1] = 2*(q1*q2 - q3*qr);
+	a[0][2] = 2*(q1*q3 + q2*qr);
+	a[1][0] = 2*(q1*q2 + q3*qr);
+	a[1][1] = 1 - 2*(q1*q1 + q3*q3);
+	a[1][2] = 2*(q2*q3 - q1*qr);
+	a[2][0] = 2*(q1*q3 - q2*qr);
+	a[2][1] = 2*(q2*q3 + q1*qr);
+	a[2][2] = 1 - 2*(q1*q1 + q2*q2);
 }
 
 
