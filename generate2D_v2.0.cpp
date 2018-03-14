@@ -371,8 +371,9 @@ vector<string> tokenizeString(string str)
 
 /** Create a 3D Model from input .txt files of
   * vertices and edges for 2D file. */
-void createModel3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2, Model3D model)
+Model3D createModel3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2)
 {
+	Model3D model;
 	float x,y,z;
 	string str,name;
 	vector <Vertex3D> vertex;
@@ -509,7 +510,7 @@ void generate3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2, float x
 	ofstream edge("edge.txt");
 
 	/// Function to create the 3D model
-	createModel3D(v1, v2, e1, e2, model);
+	model = createModel3D(v1, v2, e1, e2);
 	getEdges(model, edge);
 	getVertex(model, vertex);
 
