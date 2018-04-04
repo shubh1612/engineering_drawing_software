@@ -1,6 +1,8 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+#define least 0.0001
+
 /** This class defines a vertex of a 2D 
   * object which contains two coordinates 
   * and the vector of edges from
@@ -9,7 +11,7 @@ using namespace std;
 class Vertex2D
 {
 	public :
-	float x,y;
+	double x,y;
 
 	/// Name of vertex
 	string name;
@@ -82,7 +84,7 @@ class Vertex3D
 	public :
 
 	/// 3 coordinates of vertex
-	float x,y,z;
+	double x,y,z;
 
 	/// Name of vertex
 	string name;
@@ -148,8 +150,14 @@ class Model3D
   * the viewing direction obtained from the 
   * user. */
 
-void getRotaionMatrix(float x, float y, float z, double a[][3])
+void getRotaionMatrixz(float x, float y, float z, double a[][3])
 {
+	if(x == 0 && y == 0)
+	{
+		a[2][0] = a[2][1] = a[0][1] = a[0][2] = a[1][0] = a[1][2] = 0;
+		a[0][0] = a[1][1] = a[2][2] = 1;
+		return;
+	}
 	float value = z/(pow(x*x+y*y+z*z, 0.5));
 	float theta = acos(value);
 	float qr, q1, q2, q3 = 0;
@@ -167,41 +175,112 @@ void getRotaionMatrix(float x, float y, float z, double a[][3])
 	a[2][2] = 1 - 2*(q1*q1 + q2*q2);
 }
 
+void getRotaionMatrixx(float x, float y, float z, double a[][3])
+{
+	if(y == 0 && z == 0)
+	{
+		a[2][0] = a[2][1] = a[0][1] = a[0][2] = a[1][0] = a[1][2] = 0;
+		a[0][0] = a[1][1] = a[2][2] = 1;
+		return;
+	}
+	float value = x/(pow(x*x+y*y+z*z, 0.5));
+	float theta = acos(value);
+	float qr, q1 = 0, q2, q3;
+	qr = cos(theta/2);
+	q2 = y*sin(theta/2)/(pow(z*z+y*y, 0.5));
+	q3 = -z*sin(theta/2)/(pow(z*z+y*y, 0.5));
+	a[0][0] = 1 - 2*(q2*q2 + q3*q3);
+	a[0][1] = 2*(q1*q2 - q3*qr);
+	a[0][2] = 2*(q1*q3 + q2*qr);
+	a[1][0] = 2*(q1*q2 + q3*qr);
+	a[1][1] = 1 - 2*(q1*q1 + q3*q3);
+	a[1][2] = 2*(q2*q3 - q1*qr);
+	a[2][0] = 2*(q1*q3 - q2*qr);
+	a[2][1] = 2*(q2*q3 + q1*qr);
+	a[2][2] = 1 - 2*(q1*q1 + q2*q2);
+}
+
+void getRotaionMatrixy(float x, float y, float z, double a[][3])
+{
+	if(x == 0 && z == 0)
+	{
+		a[2][0] = a[2][1] = a[0][1] = a[0][2] = a[1][0] = a[1][2] = 0;
+		a[0][0] = a[1][1] = a[2][2] = 1;
+		return;
+	}
+	float value = y/(pow(x*x+y*y+z*z, 0.5));
+	float theta = acos(value);
+	float qr, q1, q2 = 0, q3;
+	qr = cos(theta/2);
+	q1 = z*sin(theta/2)/(pow(x*x+z*z, 0.5));
+	q3 = -x*sin(theta/2)/(pow(x*x+z*z, 0.5));
+	a[0][0] = 1 - 2*(q2*q2 + q3*q3);
+	a[0][1] = 2*(q1*q2 - q3*qr);
+	a[0][2] = 2*(q1*q3 + q2*qr);
+	a[1][0] = 2*(q1*q2 + q3*qr);
+	a[1][1] = 1 - 2*(q1*q1 + q3*q3);
+	a[1][2] = 2*(q2*q3 - q1*qr);
+	a[2][0] = 2*(q1*q3 - q2*qr);
+	a[2][1] = 2*(q2*q3 + q1*qr);
+	a[2][2] = 1 - 2*(q1*q1 + q2*q2);
+}
 
 /** Function to get the projections of each vertex of the model 
   * when rotated using the specified rotation
   * matrix. */
 
-Vertex3D getProjection(Vertex3D v, double rotationMatrix[][3])
+Vertex2D getProjection(Vertex3D v, double rotationMatrix[][3], int count)
 {
-	Vertex3D v_new;
+	Vertex2D v_new;
 	v_new.name = v.name;
 	double newVertices[3] = {0}, oldVertices[3] = {v.x, v.y, v.z};
 	
-	for(int i=0;i<3;i++) 
-		for(int j=0;j<3;j++) 
+	for(int i=0;i<3;i++)
+		for(int j=0;j<3;j++)
 			newVertices[i] += rotationMatrix[i][j]*oldVertices[j];
+
+	v_new.x = newVertices[1];
+	v_new.y = newVertices[2];
 	
-	v_new.x = newVertices[0];
-	v_new.y = newVertices[1];
-	v_new.z = newVertices[2];
+	/*if(count == 0)
+	{
+		v_new.x = newVertices[1];
+		v_new.y = newVertices[2];
+	}
+	else if(count == 1)
+	{
+		v_new.x = newVertices[1];
+		v_new.y = newVertices[2];
+	}
+	else if(count == 2)
+	{
+		v_new.x = newVertices[1];
+		v_new.y = newVertices[2];
+	}*/
 	return v_new;
 }
 
 
 /** Function to output the complete transformed model */
 
-void rotatedModel3D(Model3D model, double rotationMatrix[][3])
+Model2D rotatedModel3D(Model3D model, Model2D outputModel, double rotationMatrix[][3], int count)
 {
-	Vertex3D v, v_new;
+	Vertex3D v;
+	Vertex2D v_new;
 	int len = model.vertexLength();
-
 	for(int i=0;i<len;i++)
 	{
 		v = model.vertexVector[i];
-		v_new = getProjection(v, rotationMatrix);
-		model.vertexVector[i] = v_new;
+		v_new = getProjection(v, rotationMatrix, count);
+		if(count == 0)
+			outputModel.vertexVector1.push_back(v_new);
+		else if(count == 1)
+			outputModel.vertexVector2.push_back(v_new);
+		else if(count == 2)
+			outputModel.vertexVector3.push_back(v_new);
 	}
+
+	return outputModel;
 }
 
 
@@ -210,8 +289,8 @@ void rotatedModel3D(Model3D model, double rotationMatrix[][3])
 
 void graphicalOutput(Model2D outputModel)
 {
-	ofstream file_v1("Front View Vertices"), file_v2("Top View Vertices"), file_v3("Side View Vertices");
-	ofstream file_e1("Front View Edges"), file_e2("Top View Edges"), file_e3("Side View Edges");
+	ofstream file_v1("FrontViewVertices.txt"), file_v2("TopViewVertices.txt"), file_v3("SideViewVertices.txt");
+	ofstream file_e1("FrontViewEdges.txt"), file_e2("TopViewEdges.txt"), file_e3("SideViewEdges.txt");
 	
 	int vertexLength = outputModel.vertex1Length(), edgeLength = outputModel.edge1Length();
 	Vertex2D v; Edge2D e;
@@ -257,72 +336,73 @@ void graphicalOutput(Model2D outputModel)
 	}
 }
 
+int findIndex(Model2D outputModel, string n)
+{
+	int len = outputModel.vertex1Length();
+	for(int i=0; i<len; i++)
+	{
+		if(outputModel.vertexVector1[i].name == n)
+			return i;
+	}
+}
+
+bool sameVertex(Vertex2D v1, Vertex2D v2)
+{
+	if(abs(v1.x - v2.x) < least && abs(v1.y - v2.y) < least)
+		return 1;
+	return 0;
+}
+
 /**Function to get 2D model from the 3D Model after
   * removing one of the corrdinates in each of the view. */
 
-Model2D projectedModel(Model3D model)
+Model2D projectedModel(Model3D model, Model2D outputModel)
 {
-	Model2D new2DModel;
-	Vertex2D v1, v2, v3; // v1 -- (x,y), v2 -- (y,z), v3 -- (z,x)
-	Vertex3D v;
-	int len = model.vertexLength();
-	
-	for(int i=0;i<len;i++)
-	{
-		v = model.vertexVector[i];
-		v3.y = v1.x = v.x;
-		v1.y = v2.x = v.y;
-		v2.y = v3.x = v.z;
-		v1.name = v2.name = v3.name = v.name;
+	Vertex2D v11, v12;
+	Edge2D e1;
+	int len = model.edgeLength();
 
-		for(int j=0;j<v.vertex3DEdgeVector.size();j++)
-		{
-			Vertex3D extraV;
-			Vertex2D extraV1, extraV2, extraV3;
-			extraV = v.vertex3DEdgeVector[j];
-			extraV3.y = extraV1.x = extraV.x;
-			extraV1.y = extraV2.x = extraV.y;
-			extraV2.y = extraV3.x = extraV.z;
-			extraV1.name = extraV2.name = extraV3.name = extraV.name;
-
-			if(extraV1.x != v1.x || extraV1.y != v1.y) v1.vertex2DAddNeighbour(extraV1);
-			if(extraV2.x != v2.x || extraV2.y != v1.y) v2.vertex2DAddNeighbour(extraV2);
-			if(extraV3.x != v3.x || extraV3.y != v3.y) v3.vertex2DAddNeighbour(extraV3);
-		}
-
-		new2DModel.vertexVector1.push_back(v1);
-		new2DModel.vertexVector2.push_back(v2);
-		new2DModel.vertexVector3.push_back(v3);
-	}
-
-	len = model.edgeLength();
 	for(int i=0;i<len;i++)
 	{
 		Edge3D e = model.edgesVector[i];
 		Vertex3D v1 = e.v1, v2 = e.v2;
-		Edge2D e1, e2, e3;
-		Vertex2D v11, v12, v13, v21, v22, v23;
+		string n1 = v1.name, n2 = v2.name;
 		
-		v13.y = v11.x = v1.x;
-		v11.y = v12.x = v1.y;
-		v12.y = v13.x = v1.z;
-		v11.name = v12.name = v13.name = v1.name;
-		
-		v23.y = v21.x = v2.x;
-		v21.y = v22.x = v2.y;
-		v22.y = v23.x = v2.z;
-		v21.name = v22.name = v23.name = v2.name;
+		int index1 = findIndex(outputModel, n1);
+		int index2 = findIndex(outputModel, n2);
 
-		e1.v1 = v11; e1.v2 = v21;
-		e2.v1 = v12; e2.v2 = v22;
-		e3.v1 = v13; e3.v2 = v23;
-		
-		if(v11.x != v21.x || v11.y != v21.y) new2DModel.edgesVector1.push_back(e1);
-		if(v12.x != v22.x || v12.y != v22.y) new2DModel.edgesVector2.push_back(e2);
-		if(v13.x != v23.x || v13.y != v23.y) new2DModel.edgesVector3.push_back(e3);
+		v11 = outputModel.vertexVector1[index1];
+		v12 = outputModel.vertexVector1[index2];
+		if(!sameVertex(v11, v12))
+		{	
+			e1.v1 = v11; e1.v2 = v12;
+			v11.vertex2DAddNeighbour(v12);
+			v12.vertex2DAddNeighbour(v11);
+			outputModel.edgesVector1.push_back(e1);
+		}
+
+		v11 = outputModel.vertexVector2[index1];
+		v12 = outputModel.vertexVector2[index2];
+		if(!sameVertex(v11, v12))
+		{
+			e1.v1 = v11; e1.v2 = v12;
+			v11.vertex2DAddNeighbour(v12);
+			v12.vertex2DAddNeighbour(v11);
+			outputModel.edgesVector2.push_back(e1);
+		}
+
+		v11 = outputModel.vertexVector3[index1];
+		v12 = outputModel.vertexVector3[index2];
+		if(!sameVertex(v11, v12))
+		{
+			e1.v1 = v11; e1.v2 = v12;
+			v11.vertex2DAddNeighbour(v12);
+			v12.vertex2DAddNeighbour(v11);
+			outputModel.edgesVector3.push_back(e1);
+		}
 	}
 
-	return new2DModel;
+	return outputModel;
 }
 
 /** Function to generate the 2D representation of 
@@ -335,13 +415,25 @@ void generate2D(Model3D model, float x, float y, float z)
 	Model2D outputModel;
 
 	/// Obtains the rotation matrix from the viewing direction coordinates
-	getRotaionMatrix(x, y, z, rotationMatrix);
+	getRotaionMatrixx(x, y, z, rotationMatrix);
 
 	/// Generate the rotated 3D model
-	rotatedModel3D(model, rotationMatrix);
+	outputModel = rotatedModel3D(model, outputModel, rotationMatrix, 0);
+
+	/// Obtains the rotation matrix from the viewing direction coordinates
+	getRotaionMatrixy(x, y, z, rotationMatrix);
+
+	/// Generate the rotated 3D model
+	outputModel = rotatedModel3D(model, outputModel, rotationMatrix, 1);
+
+	/// Obtains the rotation matrix from the viewing direction coordinates
+	getRotaionMatrixz(x, y, z, rotationMatrix);
+
+	/// Generate the rotated 3D model
+	outputModel = rotatedModel3D(model, outputModel, rotationMatrix, 2);
 
 	/// Creates a 2D model from rotated 3D Model
-	outputModel = projectedModel(model);
+	outputModel = projectedModel(model, outputModel);
 
 	/// Final graphical output in form of files
 	graphicalOutput(outputModel);
@@ -381,16 +473,14 @@ Model3D createModel3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2)
 	vector<string> vertexNames;
 	vector<string> tokens;
 	
-	getline(v2, str);
+	getline(v1, str);
 	tokens = tokenizeString(str);
 	string view1 = tokens[0],	 view2 = tokens[1];
-
 	while(getline(v1, str)){
 		
 		tokens = tokenizeString(str);
 		v.name = tokens[0];
 		vertexNames.push_back(tokens[0]);
-		
 		if(view1 == "x" && view2 == "y")
 		{ 
 			v.x = stoi(tokens[1]);
@@ -402,7 +492,7 @@ Model3D createModel3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2)
 			v.z = stoi(tokens[2]);
 		}
 		else if(view1 == "x" && view2 == "z")
-		{ 
+		{
 			v.x = stoi(tokens[1]); 
 			v.z = stoi(tokens[2]);
 		}
@@ -419,7 +509,6 @@ Model3D createModel3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2)
 		
 		tokens = tokenizeString(str);
 		int index = find(vertexNames.begin(), vertexNames.end(), tokens[0]) - vertexNames.begin();
-		
 		if(view1 == "x" && view2 == "y")
 		{ 
 			vertex[index].x = stoi(tokens[1]);
@@ -432,13 +521,11 @@ Model3D createModel3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2)
 		}
 		else if(view1 == "x" && view2 == "z")
 		{
-			vertex[index].x = stoi(tokens[1]); 
+			vertex[index].x = stoi(tokens[1]);
 			vertex[index].z = stoi(tokens[2]);
 		}
 	}
-
 	model.vertexVector = vertex;
-
 	while(getline(e1, str)){
 	
 		tokens = tokenizeString(str);
@@ -454,7 +541,6 @@ Model3D createModel3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2)
 	}
 	
 	int length = model.edgeLength();
-
 	while(getline(e2, str)){
 	
 		tokens = tokenizeString(str);
@@ -467,8 +553,8 @@ Model3D createModel3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2)
 			vertex[index1].vertex3DAddNeighbour(v);
 			vertex[index2].vertex3DAddNeighbour(u);
 		}
-
 	}
+	return model;
 }
 
 
@@ -515,7 +601,7 @@ void generate3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2, float x
 	getVertex(model, vertex);
 
 	/// Reduce the problem to projecting from 3D to 2D views
-	generate2D(model, x, y, z);
+	generate2D(model, x, y, z);	
 }
 
 
@@ -571,7 +657,7 @@ void interfaceFor3Dto2D()
 	    cerr << "Unable to open file datafile.txt";
 	    exit(1);   // call system to stop
 	}
-
+	
 	Model3D model = model3DFromInputFiles(v, e);
 	generate2D(model, x, y, z);
 }
@@ -587,16 +673,20 @@ void interfaceFor2Dto3D()
 	cin>>x>>y>>z;
 
 	ifstream v1,e1,v2,e2;
-	v1.open("Vertices1.txt");
-	e1.open("Edges1.txt");
-	v2.open("Vertices2.txt");
-	e2.open("Edges2.txt");
+	v1.open("TopViewVertices.txt");
+	e1.open("TopViewEdges.txt");
+	v2.open("SideViewVertices.txt");
+	e2.open("SideViewEdges.txt");
 
+	if (!v1 || !e1 || !v2 || !e2) {
+	    cerr << "Unable to open file datafile.txt";
+	    exit(1);   // call system to stop
+	}
 	generate3D(v1, v2, e1, e2, x, y, z);
 }
 
 
-/** Function for initial interface sdhowing 2 buttons
+/** Function for initial interface showing 2 buttons
   * for 3D to 2D and 2D to 3D conversion. */
 
 void interfaceforCAD(int num)
