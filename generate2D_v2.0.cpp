@@ -1,4 +1,6 @@
+/** @file */
 #include<bits/stdc++.h>
+#include<graphics.h>
 using namespace std;
 
 #define least 0.0001
@@ -300,11 +302,17 @@ void graphicalOutput(Model2D outputModel)
 		v = outputModel.vertexVector1[i];
 		file_v1<<v.name<<" "<<v.x<<" "<<v.y<<"\n";
 	}
+
 	for(int i=0;i<edgeLength;i++)
 	{
+//		initgraph(&gd, &gm, "");
+//		line(e.v1.x*100, e.v1.y*100, e.v2.x*100, e.v2.y*100);
 		e = outputModel.edgesVector1[i];
 		file_e1<<e.v1.name<<" "<<e.v2.name<<"\n";
 	}
+	
+//	sleep(1000);
+//	closegraph();
 
 	vertexLength = outputModel.vertex2Length();
 	edgeLength = outputModel.edge2Length(); 
@@ -334,6 +342,17 @@ void graphicalOutput(Model2D outputModel)
 		e = outputModel.edgesVector3[i];
 		file_e3<<e.v1.name<<" "<<e.v2.name<<"\n";
 	}
+	
+/*	int gd = DETECT, gm;
+	for(int i=0;i<edgeLength;i++)
+	{
+		e = outputModel.edgesVector3[i];
+		initgraph(&gd, &gm, "");
+		line(abs(e.v1.x*100), abs(e.v1.y*100), abs(e.v2.x*100), abs(e.v2.y*100));
+	}
+	sleep(1000);
+	closegraph();*/
+
 }
 
 int findIndex(Model2D outputModel, string n)
@@ -491,7 +510,7 @@ Model3D createModel3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2)
 			v.y = stoi(tokens[1]);
 			v.z = stoi(tokens[2]);
 		}
-		else if(view1 == "x" && view2 == "z")
+		else if(view1 == "z" && view2 == "x")
 		{
 			v.x = stoi(tokens[1]); 
 			v.z = stoi(tokens[2]);
@@ -519,7 +538,7 @@ Model3D createModel3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2)
 			vertex[index].y = stoi(tokens[1]); 
 			vertex[index].z = stoi(tokens[2]);
 		}
-		else if(view1 == "x" && view2 == "z")
+		else if(view1 == "z" && view2 == "x")
 		{
 			vertex[index].x = stoi(tokens[1]);
 			vertex[index].z = stoi(tokens[2]);
@@ -601,7 +620,7 @@ void generate3D(ifstream& v1, ifstream& v2, ifstream& e1,  ifstream& e2, float x
 	getVertex(model, vertex);
 
 	/// Reduce the problem to projecting from 3D to 2D views
-	generate2D(model, x, y, z);	
+	//generate2D(model, x, y, z);	
 }
 
 
