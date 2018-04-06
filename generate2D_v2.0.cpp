@@ -227,38 +227,29 @@ void getRotaionMatrixy(float x, float y, float z, double a[][3])
 	a[2][2] = 1 - 2*(q1*q1 + q2*q2);
 }
 
+bool sameValue(int x, int y)
+{
+	if(abs(x - y) < least)
+		return 1;
+	return 0;	
+}
+
 /** Function to get the projections of each vertex of the model 
   * when rotated using the specified rotation
   * matrix. */
 
 Vertex2D getProjection(Vertex3D v, double rotationMatrix[][3], int count)
 {
-	Vertex2D v_new;
-	v_new.name = v.name;
+	Vertex2D v_new, v1;
+	v1.name = v_new.name = v.name;
 	double newVertices[3] = {0}, oldVertices[3] = {v.x, v.y, v.z};
-	
+	v1.x = v.y; v1.y = v.z;
 	for(int i=0;i<3;i++)
 		for(int j=0;j<3;j++)
 			newVertices[i] += rotationMatrix[i][j]*oldVertices[j];
 
 	v_new.x = newVertices[1];
 	v_new.y = newVertices[2];
-	
-	/*if(count == 0)
-	{
-		v_new.x = newVertices[1];
-		v_new.y = newVertices[2];
-	}
-	else if(count == 1)
-	{
-		v_new.x = newVertices[1];
-		v_new.y = newVertices[2];
-	}
-	else if(count == 2)
-	{
-		v_new.x = newVertices[1];
-		v_new.y = newVertices[2];
-	}*/
 	return v_new;
 }
 
@@ -305,15 +296,10 @@ void graphicalOutput(Model2D outputModel)
 
 	for(int i=0;i<edgeLength;i++)
 	{
-//		initgraph(&gd, &gm, "");
-//		line(e.v1.x*100, e.v1.y*100, e.v2.x*100, e.v2.y*100);
 		e = outputModel.edgesVector1[i];
 		file_e1<<e.v1.name<<" "<<e.v2.name<<"\n";
 	}
 	
-//	sleep(1000);
-//	closegraph();
-
 	vertexLength = outputModel.vertex2Length();
 	edgeLength = outputModel.edge2Length(); 
 	
@@ -343,16 +329,6 @@ void graphicalOutput(Model2D outputModel)
 		file_e3<<e.v1.name<<" "<<e.v2.name<<"\n";
 	}
 	
-/*	int gd = DETECT, gm;
-	for(int i=0;i<edgeLength;i++)
-	{
-		e = outputModel.edgesVector3[i];
-		initgraph(&gd, &gm, "");
-		line(abs(e.v1.x*100), abs(e.v1.y*100), abs(e.v2.x*100), abs(e.v2.y*100));
-	}
-	sleep(1000);
-	closegraph();*/
-
 }
 
 int findIndex(Model2D outputModel, string n)
@@ -370,6 +346,62 @@ bool sameVertex(Vertex2D v1, Vertex2D v2)
 	if(abs(v1.x - v2.x) < least && abs(v1.y - v2.y) < least)
 		return 1;
 	return 0;
+}
+
+/** Make all the vertices positive by shifting*/
+Model2D positive(Model2D outputModel)
+{
+	int vertexLength = outputModel.vertex1Length();
+	Vertex2D v;
+	double min_1 = 0, min_2 = 0;
+	
+	for(int i=0;i<vertexLength;i++)
+	{
+		v = outputModel.vertexVector1[i];
+		if(v.x < min_1) min_1 = v.x;
+		if(v.y < min_2) min_2 = v.y;
+	}
+
+	for(int i=0;i<vertexLength;i++)
+	{
+		outputModel.vertexVector1[i].x -= min_1;
+		outputModel.vertexVector1[i].y -= min_2;
+	}	
+
+	min_1 = min_2 = 0;
+	vertexLength = outputModel.vertex2Length();
+	
+	for(int i=0;i<vertexLength;i++)
+	{
+		v = outputModel.vertexVector2[i];
+		if(v.x < min_1) min_1 = v.x;
+		if(v.y < min_2) min_2 = v.y;
+	}
+
+	for(int i=0;i<vertexLength;i++)
+	{
+		outputModel.vertexVector2[i].x -= min_1;
+		outputModel.vertexVector2[i].y -= min_2;
+	}	
+
+	min_1 = min_2 = 0;
+	vertexLength = outputModel.vertex3Length();
+	
+	for(int i=0;i<vertexLength;i++)
+	{
+		v = outputModel.vertexVector3[i];
+		if(v.x < min_1) min_1 = v.x;
+		if(v.y < min_2) min_2 = v.y;
+	}
+	for(int i=0;i<vertexLength;i++)
+	{
+		outputModel.vertexVector3[i].x -= min_1;
+//		cout<<outputModel.vertexVector3[i].y<<"\n";
+		outputModel.vertexVector3[i].y = outputModel.vertexVector3[i].y - min_2;
+//		cout<<outputModel.vertexVector3[i].y<<"\n";
+	}	
+
+	return outputModel;
 }
 
 /**Function to get 2D model from the 3D Model after
@@ -424,6 +456,40 @@ Model2D projectedModel(Model3D model, Model2D outputModel)
 	return outputModel;
 }
 
+void graphicsOutput(Model2D outputModel)
+{
+	int edgeLength = outputModel.edge3Length(); 
+	int gd = DETECT, gm;
+
+	for(int i=0;i<edgeLength;i++)
+	{
+		Edge2D e = outputModel.edgesVector3[i];
+		initgraph(&gd, &gm, "");
+		line(abs(e.v1.x*100), abs(e.v1.y*100), abs(e.v2.x*100), abs(e.v2.y*100));
+	}
+	
+	edgeLength = outputModel.edge2Length(); 
+
+	for(int i=0;i<edgeLength;i++)
+	{
+		Edge2D e = outputModel.edgesVector2[i];
+		//initgraph(&gd, &gm, "");
+		line(abs(e.v1.x*100) + 100, abs(e.v1.y*100) + 100, abs(e.v2.x*100) + 100, abs(e.v2.y*100) + 100);
+	}
+
+	edgeLength = outputModel.edge1Length(); 
+
+	for(int i=0;i<edgeLength;i++)
+	{
+		Edge2D e = outputModel.edgesVector1[i];
+		//initgraph(&gd, &gm, "");
+		line(abs(e.v1.x*100) + 200, abs(e.v1.y*100) + 200, abs(e.v2.x*100) + 200, abs(e.v2.y*100) + 200);
+	}
+	sleep(1000);
+	closegraph();
+
+}
+
 /** Function to generate the 2D representation of 
   * the vector of edges and vertices parsed as a file
   * along with viewing direction coordinates. */
@@ -454,8 +520,12 @@ void generate2D(Model3D model, float x, float y, float z)
 	/// Creates a 2D model from rotated 3D Model
 	outputModel = projectedModel(model, outputModel);
 
+	/// Make positive
+	outputModel = positive(outputModel);
 	/// Final graphical output in form of files
 	graphicalOutput(outputModel);
+
+	graphicsOutput(outputModel);
 }
 
 
@@ -710,9 +780,14 @@ void interfaceFor2Dto3D()
 
 void interfaceforCAD(int num)
 {
+	if(num != 0 && num != 1) 
+	{
+		cout<<"Wrong Input !!! Try Again.\n";
+		return;
+	}
+	cout<<"\nEnter (a,b,c) for viewing direction - \n";	
 	if(num == 0) interfaceFor2Dto3D();
 	else if(num == 1) interfaceFor3Dto2D();
-	else cout<<"Wrong Input\n";
 }
 
 
@@ -721,7 +796,9 @@ void interfaceforCAD(int num)
 
 int main()
 {
+	cout<<"Enter a number\n1.) For 2D to 3D projections - enter 0\n2.) For 3D to 2D projections - enter 1\n";
 	int num;
 	cin>>num;
 	interfaceforCAD(num);
+	cout<<"\nProjection Completed\n\n";
 }
