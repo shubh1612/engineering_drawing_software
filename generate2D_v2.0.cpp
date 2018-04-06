@@ -460,11 +460,11 @@ void graphicsOutput(Model2D outputModel)
 {
 	int edgeLength = outputModel.edge3Length(); 
 	int gd = DETECT, gm;
+	initgraph(&gd, &gm, "");
 
 	for(int i=0;i<edgeLength;i++)
 	{
 		Edge2D e = outputModel.edgesVector3[i];
-		initgraph(&gd, &gm, "");
 		line(abs(e.v1.x*100), abs(e.v1.y*100), abs(e.v2.x*100), abs(e.v2.y*100));
 	}
 	
@@ -473,7 +473,6 @@ void graphicsOutput(Model2D outputModel)
 	for(int i=0;i<edgeLength;i++)
 	{
 		Edge2D e = outputModel.edgesVector2[i];
-		//initgraph(&gd, &gm, "");
 		line(abs(e.v1.x*100) + 100, abs(e.v1.y*100) + 100, abs(e.v2.x*100) + 100, abs(e.v2.y*100) + 100);
 	}
 
@@ -482,7 +481,6 @@ void graphicsOutput(Model2D outputModel)
 	for(int i=0;i<edgeLength;i++)
 	{
 		Edge2D e = outputModel.edgesVector1[i];
-		//initgraph(&gd, &gm, "");
 		line(abs(e.v1.x*100) + 200, abs(e.v1.y*100) + 200, abs(e.v2.x*100) + 200, abs(e.v2.y*100) + 200);
 	}
 	sleep(1000);
