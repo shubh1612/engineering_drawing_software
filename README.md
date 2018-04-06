@@ -1,7 +1,11 @@
 # engineering_drawing_software
 
 It contains one code file with the name generate2D_v2.0.cpp file.
-Run it through command line - g++ generate2D_v2.0.cpp -std=c++11
+Make sure libgraph library is present
+Run it through command line using - g++ generate2D_v2.0.cpp -std=c++11
+or
+In command prompt - make
+and then, run the executable using ./generate2D_v2.0
 It will ask for one number.
 Number 0 represents conversion from 2D to 3D and number 1 represents converting 2D views to 3D object.
 After entering either 1 or 0, we need to enter the viewing direction where it is represented by vector (a,b,c) and (0,0,0).
@@ -42,4 +46,3 @@ refman.pdf contains the doxygen documentation for the code.
 Class diagram.jpg/xml/pdf are the class diagrams.
 Functional_Specification.jpg contains the functional specification and mathematical analysis is the initial maths used to design the software.
 cad_v1_0.cpp contains the same code using openGL which may or may not be working and is under process.
-Makefile couldn't be completed due to incomplete graphics part.
